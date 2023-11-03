@@ -18,6 +18,8 @@ const {
   logOutUser,
   addUserContact,
   getUserContacts,
+  upload,
+  updateAvatar,
 } = require("../../models/users");
 const { User } = require("../../models/schemas/Users");
 
@@ -185,5 +187,23 @@ router.patch("/users", auth, async (req, res, next) => {
     res.status(400).json({ message: "Bad request" });
   }
 });
+
+router.patch(
+  "/users/avatars",
+  auth,
+  upload.single("avatar"),
+  async (req, res, next) => {
+    try {
+      const user = req.user;
+      const uploadedFile = req.file;
+      const data = await updateAvatar(user, uploadedFile);
+      console.log(data);
+      res.status(data.statusCode).json(data.message);
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ message: "Bad request" });
+    }
+  }
+);
 
 module.exports = router;
